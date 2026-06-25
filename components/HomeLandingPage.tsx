@@ -1,53 +1,70 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { Alert, Dimensions, Image, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface HomeLandingPageProps {
   aoIniciarTreino: () => void;
-  aoClicarFranquia: () => void; // Conexão com a nova tela criada
+  aoClicarFranquia: () => void;
 }
 
 export default function HomeLandingPage({ aoIniciarTreino, aoClicarFranquia }: HomeLandingPageProps) {
-  // Referência do ScrollView para fazer a Nav Bar rolar a tela suavemente
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Funções para rolar até as seções da Landing Page
   const rolarParaSeção = (y: number) => {
     scrollViewRef.current?.scrollTo({ y, animated: true });
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'React Native | A framework for building native apps using React',
+      });
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
   };
 
   return (
     <View style={styles.container}>
       
-      {/* 1. TOP NAV BAR (Navegação interna e externa) */}
+      {/* 1. NAV BAR BLINDADA CONTRA QUEBRA DE LAYOUT */}
       <View style={styles.navBar}>
-        <Text style={styles.navLogo}>Flowy</Text>
+        <Text style={styles.navLogo} numberOfLines={1}>Flowy</Text>
+        
         <View style={styles.navLinks}>
           <TouchableOpacity onPress={() => rolarParaSeção(0)}>
-            <Text style={styles.navTextAtivo}>Início</Text>
+            <Text style={styles.navText} numberOfLines={1}>Início</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => rolarParaSeção(580)}>
-            <Text style={styles.navText}>Sobre Yoga</Text>
+          
+          <TouchableOpacity onPress={() => rolarParaSeção(height * 0.65)}>
+            <Text style={styles.navText} numberOfLines={1}>Sobre</Text>
           </TouchableOpacity>
-          {/* Atualizado para redirecionar para a tela institucional de franquias */}
+          
           <TouchableOpacity onPress={aoClicarFranquia}>
-            <Text style={styles.navText}>Franquias</Text>
+            <Text style={styles.navText} numberOfLines={1}>Seja Sócio</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navBotaoPequeno} onPress={aoIniciarTreino}>
-            <Text style={styles.navBotaoTexto}>Treinar 🧘‍♀️</Text>
+
+          {/* BOTÃO DE SHARE EM FORMATO COMPACTO PARA CABER EM QUALQUER CELULAR */}
+          <TouchableOpacity style={styles.navBotaoShare} onPress={onShare} activeOpacity={0.7}>
+            <Text style={styles.navBotaoShareTexto} numberOfLines={1}>
+              {width < 360 ? '🔗' : '🔗 Compartilhar'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.navBotaoPequeno} onPress={aoIniciarTreino} activeOpacity={0.7}>
+            <Text style={styles.navBotaoTexto} numberOfLines={1}>Treinar</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* CONTEÚDO PRINCIPAL (LANDING PAGE) */}
+      {/* CONTEÚDO PRINCIPAL */}
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollContainer} 
         showsVerticalScrollIndicator={false}
       >
-        
-        {/* 2. SEÇÃO HERO / BANNER PRINCIPAL (Promocional) */}
+        {/* 2. SEÇÃO HERO / BANNER PRINCIPAL */}
         <View style={styles.heroContainer}>
           <Image 
             source={{ uri: 'https://images.unsplash.com/photo-1545208393-2160291ba89e?q=80&w=1000' }} 
@@ -65,17 +82,14 @@ export default function HomeLandingPage({ aoIniciarTreino, aoClicarFranquia }: H
           </View>
         </View>
 
-        {/* 3. SEÇÃO: O QUE É O YOGA FLOWY */}
+        {/* 3. SEÇÃO: O QUE É O YOGA */}
         <View style={styles.secaoBranca}>
           <Text style={styles.secaoTag}>O MOVIMENTO</Text>
           <Text style={styles.secaoTitulo}>Por que o Yoga?</Text>
           <Text style={styles.secaoDescricao}>
-            Mais do que posturas físicas, o Yoga na rede Flowy é uma tecnologia de bem-estar. 
-            Cada asana (postura) e pranayama (respiração) é desenhado para lubrificar suas articulações, 
-            reduzir o cortisol e devolver a clareza mental que o dia a dia rouba de você.
+            Mais do que posturas físicas, o Yoga na rede Flowy é uma tecnologia de bem-estar.
           </Text>
 
-          {/* Mini Banners de Benefícios */}
           <View style={styles.cardsContainer}>
             <View style={styles.beneficioCard}>
               <Text style={styles.beneficioEmoji}>🌬️</Text>
@@ -90,7 +104,7 @@ export default function HomeLandingPage({ aoIniciarTreino, aoClicarFranquia }: H
           </View>
         </View>
 
-        {/* 4. BANNER INTERMEDIÁRIO (Chamada de Impacto) */}
+        {/* 4. BANNER INTERMEDIÁRIO */}
         <View style={styles.bannerMeioContainer}>
           <Image 
             source={{ uri: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1000' }} 
@@ -101,32 +115,18 @@ export default function HomeLandingPage({ aoIniciarTreino, aoClicarFranquia }: H
           </View>
         </View>
 
-        {/* 5. SEÇÃO SEJA UM FRANQUEADO (Loja de Franquia) */}
+        {/* 5. SEÇÃO FRANQUEADO */}
         <View style={styles.secaoRoxa}>
           <Text style={styles.franquiaTag}>EXPANSÃO FLOWY</Text>
           <Text style={styles.franquiaTitulo}>Abra sua própria Escola de Yoga Flowy</Text>
-          <Text style={styles.franquiaDescricao}>
-            O mercado de bem-estar e saúde mental cresce dois dígitos a cada ano. Seja dono de um modelo 
-            de negócios testado, lucrativo e com um propósito que transforma vidas diariamente.
-          </Text>
-
-          <View style={styles.franquiaInfoBox}>
-            <Text style={styles.infoBoxItem}>✅ Suporte total na escolha do ponto comercial</Text>
-            <Text style={styles.infoBoxItem}>✅ Treinamento metodológico exclusivo para professores</Text>
-            <Text style={styles.infoBoxItem}>✅ Identidade visual e arquitetura minimalista zen prontas</Text>
-          </View>
-
-          {/* Atualizado para acionar a abertura da tela de captação de leads de franquia */}
           <TouchableOpacity style={styles.botaoFranquia} onPress={aoClicarFranquia}>
             <Text style={styles.botaoFranquiaTexto}>CONHECER MODELO DE LOJA</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Rodapé institucional sutil */}
         <View style={styles.footer}>
           <Text style={styles.footerTexto}>© 2026 Rede de Academias Yoga Flowy S.A.</Text>
         </View>
-
       </ScrollView>
     </View>
   );
@@ -137,61 +137,67 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAFAFD',
   },
-  // Estilos da Nav Bar Superior
+  // Mudanças críticas aqui para impedir sobreposição em telas finas/pequenas
   navBar: {
-    height: 90,
+    height: 100,
     backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 35,
+    paddingHorizontal: width * 0.03, 
+    paddingTop: 40,
     borderBottomWidth: 1,
     borderColor: 'rgba(131, 111, 255, 0.08)',
     zIndex: 10,
   },
   navLogo: {
-    fontSize: 20,
-    fontWeight: '400',
+    fontSize: width * 0.045, 
+    fontWeight: '700',
     color: '#836FFF',
-    fontFamily: 'sans-serif-light',
-    letterSpacing: 1,
+    marginRight: 6,
   },
   navLinks: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    justifyContent: 'flex-end',
+    gap: width * 0.018, // Espaçamento menor e dinâmico entre itens
+    flex: 1, 
   },
   navText: {
-    fontSize: 13,
+    fontSize: width * 0.028, 
     color: '#7E7E8A',
     fontFamily: 'sans-serif-light',
   },
-  navTextAtivo: {
-    fontSize: 13,
+  navBotaoShare: {
+    backgroundColor: '#ECEAFB',
+    paddingHorizontal: width * 0.02,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(131, 111, 255, 0.2)',
+  },
+  navBotaoShareTexto: {
     color: '#836FFF',
-    fontWeight: '400',
-    fontFamily: 'sans-serif-light',
+    fontSize: width * 0.028,
+    fontWeight: '600',
   },
   navBotaoPequeno: {
-    backgroundColor: 'rgba(131, 111, 255, 0.1)',
-    paddingHorizontal: 12,
+    backgroundColor: '#836FFF',
+    paddingHorizontal: width * 0.025,
     paddingVertical: 6,
-    borderRadius: 10,
+    borderRadius: 8,
   },
   navBotaoTexto: {
-    color: '#836FFF',
-    fontSize: 12,
-    fontWeight: '400',
+    color: '#FFFFFF',
+    fontSize: width * 0.028,
+    fontWeight: '600',
   },
   scrollContainer: {
     flex: 1,
   },
-  // Estilos do Banner Principal (Hero)
   heroContainer: {
     width: width,
-    height: 500,
-    position: 'relative',
+    height: 460,
   },
   heroBanner: {
     width: '100%',
@@ -199,121 +205,98 @@ const styles = StyleSheet.create({
   },
   heroOverlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(42, 42, 56, 0.45)',
     justifyContent: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
   },
   promoTag: {
     color: '#FFF',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '500',
-    letterSpacing: 1.5,
     backgroundColor: '#836FFF',
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
-    overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   heroTitulo: {
-    fontSize: 34,
+    fontSize: 28,
     color: '#FFF',
-    fontFamily: 'sans-serif-light',
     fontWeight: '300',
-    lineHeight: 42,
+    lineHeight: 36,
     marginBottom: 12,
   },
   heroSubtitulo: {
-    fontSize: 15,
+    fontSize: 14,
     color: 'rgba(255, 255, 255, 0.85)',
-    fontFamily: 'sans-serif-light',
-    fontWeight: '300',
-    lineHeight: 22,
-    marginBottom: 28,
+    lineHeight: 20,
+    marginBottom: 20,
   },
   botaoPrincipal: {
     backgroundColor: '#836FFF',
-    height: 54,
-    borderRadius: 14,
+    height: 50,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#836FFF',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 4,
   },
   botaoPrincipalTexto: {
     color: '#FFF',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
-    letterSpacing: 1,
   },
-  // Estilos da Seção Sobre Yoga
   secaoBranca: {
-    paddingHorizontal: 24,
-    paddingVertical: 45,
+    paddingHorizontal: 20,
+    paddingVertical: 35,
     backgroundColor: '#FFFFFF',
   },
   secaoTag: {
     color: '#836FFF',
     fontSize: 11,
-    letterSpacing: 2,
-    fontWeight: '400',
-    marginBottom: 6,
     textAlign: 'center',
+    marginBottom: 6,
   },
   secaoTitulo: {
-    fontSize: 26,
+    fontSize: 22,
     color: '#2A2A38',
-    fontFamily: 'sans-serif-light',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   secaoDescricao: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#5C5C6A',
-    lineHeight: 24,
-    fontFamily: 'sans-serif-light',
+    lineHeight: 22,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   cardsContainer: {
-    gap: 16,
+    gap: 12,
   },
   beneficioCard: {
     backgroundColor: '#FAFAFD',
-    padding: 20,
-    borderRadius: 16,
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(131, 111, 255, 0.08)',
   },
   beneficioEmoji: {
-    fontSize: 24,
-    marginBottom: 10,
+    fontSize: 20,
+    marginBottom: 6,
   },
   beneficioTitulo: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#2A2A38',
-    fontWeight: '400',
-    marginBottom: 4,
+    fontWeight: '500',
   },
   beneficioTexto: {
     fontSize: 13,
     color: '#7E7E8A',
     lineHeight: 18,
-    fontFamily: 'sans-serif-light',
   },
-  // Banner de Meio
   bannerMeioContainer: {
     width: width,
-    height: 180,
-    position: 'relative',
+    height: 140,
   },
   bannerMeioImagem: {
     width: '100%',
@@ -325,81 +308,46 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(131, 111, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
   },
   bannerMeioTexto: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 14,
     fontStyle: 'italic',
-    textAlign: 'center',
-    lineHeight: 22,
-    fontFamily: 'sans-serif-light',
   },
-  // Seção da Franquia de Loja
   secaoRoxa: {
-    paddingHorizontal: 24,
-    paddingVertical: 45,
+    paddingHorizontal: 20,
+    paddingVertical: 35,
     backgroundColor: 'rgba(131, 111, 255, 0.04)',
-    borderTopWidth: 1,
-    borderColor: 'rgba(131, 111, 255, 0.08)',
   },
   franquiaTag: {
     color: '#836FFF',
     fontSize: 11,
-    letterSpacing: 2,
-    fontWeight: '400',
-    marginBottom: 6,
   },
   franquiaTitulo: {
-    fontSize: 26,
+    fontSize: 22,
     color: '#2A2A38',
-    fontFamily: 'sans-serif-light',
     marginBottom: 16,
-  },
-  franquiaDescricao: {
-    fontSize: 14,
-    color: '#5C5C6A',
-    lineHeight: 22,
-    fontFamily: 'sans-serif-light',
-    marginBottom: 20,
-  },
-  franquiaInfoBox: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    borderRadius: 16,
-    gap: 12,
-    marginBottom: 25,
-    borderWidth: 1,
-    borderColor: 'rgba(131, 111, 255, 0.06)',
-  },
-  infoBoxItem: {
-    fontSize: 13,
-    color: '#2A2A38',
-    fontFamily: 'sans-serif-light',
   },
   botaoFranquia: {
     borderWidth: 1,
     borderColor: '#836FFF',
-    height: 52,
-    borderRadius: 14,
+    height: 48,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(131, 111, 255, 0.02)',
   },
   botaoFranquiaTexto: {
     color: '#836FFF',
     fontSize: 13,
     fontWeight: '500',
-    letterSpacing: 1,
   },
   footer: {
-    paddingVertical: 25,
+    paddingVertical: 20,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },
   footerTexto: {
     fontSize: 11,
     color: '#A0A0AA',
-    fontFamily: 'sans-serif-light',
   },
 });
